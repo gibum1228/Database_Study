@@ -227,7 +227,7 @@ where e1.salary in (select max(salary)
 -- 43) 사원의 수가 5명 이상인 부서의 부서 이름을 출력하라
 select department_name
 from departments d
-where 5 in (select count(*)
+where 5 <= (select count(*)
             from employees e
             where d.department_id = e.department_id);
 
@@ -260,4 +260,41 @@ create table EMP3(
 id number(7),
 last_name varchar2(25),
 first_name varchar2(25),
-dept_id number(7) references dept3(id));
+dept_id number(7) references dept3(id)); -- foreign key dept_id references dept3(id)
+
+-- 3)
+create table EMPLOYEES2(
+id number(6,0),
+first_name varchar2(20),
+last_name varchar2(25),
+salary number(8,2),
+dept_id number(4,0));
+
+-- 4) 다음과 같이 긴 성을 입력할 수 있도록 EMP3 테이블을 수정한다.
+alter table emp3 modify last_name varchar2(50);
+
+-- 5) emp3 테이블에 loc라는 컬럼을 추가하라. varchar2 데이터 타입이어야 하며, 최대 10의 길이를 가진다. 디폴트 값으로는 'LA'값을 입력한다.
+alter table emp3 add LOC varchar2(10) DEFAULT LA;
+
+-- 6) emp3의 loc 컬럼 이름을 loc2로 변경하라
+alter table emp3 rename column loc to LOC2;
+
+-- 7) EMPLOYEES2 테이블에서 FIRST_NAME 열을 삭제한다. 삭제되었음을 확인한다.
+alter table employees2 drop column first_name;
+
+-- 8) DEPT3 테이블의 ID 컬럼을 삭제한다. 삭제가 불가능하다면, 가능하도록 하라
+alter table emp3 drop column dept_id;
+alter table dept3 drop column id;
+
+-- 9) emp3 테이블을 삭제하라
+drop table emp3;
+
+-- 제한조건
+-- 1)
+create table DEPT3 as
+select *
+from departments;
+alter table dept3 add constraint my_dept_id_pk primary key(id);
+
+-- 2)
+
