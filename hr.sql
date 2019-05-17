@@ -290,11 +290,50 @@ alter table dept3 drop column id;
 drop table emp3;
 
 -- 제한조건
--- 1)
+-- 1) DDL 실습에서 생성된 DEPT3 테이블을 DEPARTMENTS 테이블을 이용하여 생성하라. 데이터도 포함하여야 한다. 
+-- ID열일 사용하여 DEPT3 테이블에 대한 Primary key 제약조건을 생성한다. 제약조건의 이름은 my_dept_id_pk로 지정한다.
 create table DEPT3 as
-select *
+select department_id, department_name
 from departments;
+-- where 2 = 1; 조건이 거짓이기 때문에 데이터는 가져오지 않으며, 구조만 가져온다.
 alter table dept3 add constraint my_dept_id_pk primary key(id);
 
--- 2)
+-- 2) DDL 실습 3번 문제에 따라 EMP3 테이블을 생성하라. 단, 테이블 생성시 ID 컬럼을 기본키로 설정하라.
+-- 외래키는 설정하지 않는다. 만약 테이블이 존재한다면 삭제한 후 생성하라. 기본키 제한조건 이름은 EMP3_ID_PK로 하라
+create table emp3(
+id number(7),
+last_name varchar2(25),
+first_name varchar2(25),
+dept_id number(7),
+constraint emp3_id_pk primary key(id));
 
+-- 3) 존재하지 않는 부서(DEPT3)에 사원이 할당되지 않도록 하는 외래키 참조를 EMP3 테이블에 추가한다.
+-- 제약조건 이름은 my_emp_dept_id로 한다. 부서가 삭제되면 해당 부서에 소속되었던 사원의 소속부서의 정보는 NULL로 설정하도록 하라
+alter table emp3 add constraint my_emp_dept_id foreign key(id) references dept3(id) on delete set NULL;
+
+-- 4) DEPT3 테이블에 MANAGER_ID 컬럼을 추가하라. 이 컬럼은 EMP3 테이블의 ID를 참조한다. 존재하지 않는 사원이 할당되지 않도록 하라
+alter table dept3 add manager_id number(7) references emp3(id);
+
+-- 5) EMP3 테이블을 수정한다. 데이터 유형이 NUMBER이고 전체 자릿수 2, 소수점 이하 자릿수가 2인 COMMISSION 열을 추가한다
+-- COMMISSION 열 값은 항상 0보다 크거나 같도록 제한 조건을 설정한다
+alter table emp3 add commission number(2,2) check(commission >= 0);
+
+-- 6) DEPT3 테이블으 삭제하라. 삭제 가능한가? 삭제할 수 없다면 그 이유를 써라
+drop table dept3;
+-- 삭제가 불가능하다. SET NULL은 부모 데이터가 삭제됐을 때 NULL로 설정하라는 것이기 때문에 테이블 삭제는 할 수 없다.(delete는 가능), SET NULL은 투플단위
+
+-- 7) DEPT3의 Primary key제한조건의 이름을 확인하여, 이 제한조건을 삭제하라. 삭제 가능한가? 삭제할 수 없다면 그 이유를 써라
+alter table dept3 drop constraint my_dept_id_pk;
+-- 불가능하다. dept의 pk인 my_dept_id_pk를 emp3 테이블이 참조하고 있기 때문이다.
+
+
+-- 8) EMP3에 설정되어 있는 외래키 제한조건을 삭제하라
+alter table emp3 drop constraint my_emp_dept_id;
+
+-- 9) DEPT3의 Primary key 제한조건을 삭제하라. 이제는 삭제 가능한가?
+alter table dept3 drop constraint my_dept_id_pk;
+-- 삭제 가능하다
+
+-- 10) DEPT3 테이블을 삭제하라. 이제는 삭제가 가능한가?
+drop table dept3;
+-- 삭제 가능하다
